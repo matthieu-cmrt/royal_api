@@ -8,10 +8,8 @@ res.status(200).json({ message: "Hello World!" });
 );
 
 app.get("/test", (req, res) => {
-    // return index.html
-    res.sendFile(__dirname + "/index.html");
+    res.redirect("https://www.google.com/search?channel=fs&client=ubuntu-sn&q=never+gonna+give+you+up");
     }
-    );
-
+);
 
 module.exports = app;
