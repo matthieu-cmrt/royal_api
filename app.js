@@ -7,4 +7,11 @@ res.status(200).json({ message: "Hello World!" });
 }
 );
 
+app.get("/test", (req, res) => {
+    // return index.html
+    res.sendFile(__dirname + "/index.html");
+    }
+    );
+
+
 module.exports = app;
