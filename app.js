@@ -18,26 +18,24 @@ function generateRandomToken() {
 /// ROUTES
 ////////////
 
-// get /rooms/:code
-// get /users
-// get /user/:id
-// get /room/:id/subject/:user_id => get last subject user can see
-// post /create-room
-// post /join-room/:access_code
-// put /pass-exercise/:user_id => pass to next exercise Request body: { token: string }
-// TODO: delete /delete-room/:id => delete a room Request body: { token: string }
+// get /room/:code
+// get /users/:room_token
+// get /user/:id/:room_token
+// get /room/:id/:token/subject/:user_id => get last subject user can see
+// post /room/create
+// post /room/join/:access_code
+// put /user/pass-exercise/:user_id => pass to next exercise Request body: { token: string }
+// delete /room/:id => delete a room Request body: { token: string }
 
 ////////////
 /// GET
 ////////////
 
 /*
-    ! GET /rooms/:code
+    ! GET /room/:code
     ? This route will be used to check if a access_code is already used or not
-    If the access_code is already used => status 404
-    If the access_code is not used => status 200
 */
-app.get("/rooms/:code", (req, res) => {
+app.get("/room/:code", (req, res) => {
     let rooms = require("./rooms.json");
     let room = rooms.find(room => room.access_code === req.params.code);
     if (room) {
@@ -48,10 +46,7 @@ app.get("/rooms/:code", (req, res) => {
 });
 
 /*
-    ! GET /users
-    * Request body: {
-    *   room_token: string
-    * }
+    ! GET /users/:room_token
     ? This route will be used to get all users
     * Responde body: {
     *   nb_exercises: number,
@@ -64,9 +59,10 @@ app.get("/rooms/:code", (req, res) => {
     *  ]
     * }
 */
-app.get("/users", (req, res) => {
+app.get("/users/:room_token", (req, res) => {
+    let room_token = req.params.room_token;
     let rooms = require("./rooms.json");
-    let room = rooms.find(room => room.token === req.body.room_token);
+    let room = rooms.find(room => room.token === room_token);
     if (room) {
         res.status(200).json({
             nb_exercises: room.nb_exercices,
@@ -78,10 +74,7 @@ app.get("/users", (req, res) => {
 });
 
 /*
-    ! GET /user/:id
-    * Request body: {
-    *   room_token: string
-    * }
+    ! GET /user/:id/:room_token
     ? This route will be used to get a user by id
     * Responde body: {
     *   id: number,
@@ -89,8 +82,8 @@ app.get("/users", (req, res) => {
     *   exercise: number
     * }
 */
-app.get("/user/:id", (req, res) => {
-    let room_token = req.body.room_token;
+app.get("/user/:id/:room_token", (req, res) => {
+    let room_token = req.params.room_token;
     let rooms = require("./rooms.json");
     let room = rooms.find(room => room.token === room_token);
     if (room) {
@@ -103,10 +96,7 @@ app.get("/user/:id", (req, res) => {
     
 
 /* 
-    ! GET /room/:id/subject/:user_id
-    * Request body: {
-    *   token: string
-    * }
+    ! GET /room/:id/:token/subject/:user_id
     ? This route will be used to get the current subject of a user
     * Responde body: {
     *   subject: string
@@ -115,7 +105,7 @@ app.get("/user/:id", (req, res) => {
 app.get("/room/:token/subject/:user_id", (req, res) => {
     let room_id = req.params.id;
     let user_id = req.body.user_id;
-    let token = req.body.token;
+    let token = req.params.token;
     let rooms = require("./rooms.json");
     let room = rooms.find(room => room.token === token);
     if (room) {
@@ -138,14 +128,14 @@ app.get("/room/:token/subject/:user_id", (req, res) => {
 ////////////
 
 /*
-    ! POST /create-room
+    ! POST /room/create
     ? This route will be used to create a new room
     * Responde body: {
     *   token: string,
     *   id: number
     * }
 */
-app.post("create-room", (req, res) => {
+app.post("/room/create", (req, res) => {
     let room_name = req.body.room_name;
     let this_room_id = rooms_id++;
     let nb_files = req.body.nb_files;
@@ -173,7 +163,7 @@ app.post("create-room", (req, res) => {
 });
 
 /*
-    ! POST /join-room/:access_code
+    ! POST /room/join/:access_code
     * Request body: {
     *   username: string
     * }
@@ -184,7 +174,7 @@ app.post("create-room", (req, res) => {
     *   user_id: number
     * }
 */
-app.post("/join-room/:access_code", (req, res) => {
+app.post("/room/join/:access_code", (req, res) => {
     if (!req.body.username) {
         res.status(400).json({ message: "Username is required!" });
     }
@@ -197,6 +187,12 @@ app.post("/join-room/:access_code", (req, res) => {
             username: req.body.username,
             exercise: 0
         });
+        fs.writeFileSync("./rooms.json", JSON.stringify(rooms));
+        res.status(200).json({
+            room_token: room.token,
+            room_id: room.id,
+            user_id: this_user_id
+        });
     } else {
         res.status(404).json({ message: "Room not found!" });
     }
@@ -207,14 +203,14 @@ app.post("/join-room/:access_code", (req, res) => {
 ////////////
 
 /*
-    ! PUT /pass-exercise/:user_id
+    ! PUT /user/pass-exercise/:user_id
     * Request body: {
     *   token: string
     * }
     * This route will be used to pass to the next exercise
     * Responde body: { message: string }    
 */
-app.put("/pass-exercise/:user_id", (req, res) => {
+app.put("/user/pass-exercise/:user_id", (req, res) => {
     let room_token = req.body.token;
     let user_id = req.params.user_id;
     let rooms = require("./rooms.json");
@@ -239,14 +235,14 @@ app.put("/pass-exercise/:user_id", (req, res) => {
 ////////////
 
 /*
-    ! DELETE /delete-room/:id
+    ! DELETE /room/:id
     * Request body: {
     *   token: string
     * }
     * This route will be used to delete a room
     * Responde body: { message: string }   
 */
-app.delete("/delete-room/:id", (req, res) => {
+app.delete("/room/:id", (req, res) => {
     let room_token = req.body.token;
     let rooms = require("./rooms.json");
     let room = rooms.find(room => room.token === room_token);
