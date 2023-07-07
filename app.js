@@ -112,7 +112,7 @@ app.get("/user/:id/:room_token", (req, res) => {
     }
 
     if (room) {
-        let user = room.users.find(user => user.id === req.params.id);
+        let user = room.users.find(user => user.id === parseInt(req.params.id));
         res.status(200).json(user);
     } else {
         res.status(404).json({ message: "User not found!" });
