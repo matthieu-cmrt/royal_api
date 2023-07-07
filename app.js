@@ -101,8 +101,16 @@ app.get("/users/:room_token", (req, res) => {
 */
 app.get("/user/:id/:room_token", (req, res) => {
     let room_token = req.params.room_token;
-    
-    let room = rooms.find(room => room.token === room_token);
+    console.log(room_token);
+    let room = null;
+    for (let i = 0; i < rooms.length; i++) {
+        console.log(rooms[i].token);
+        if (rooms[i].token === room_token) {
+            room = rooms[i];
+            break;
+        }
+    }
+
     if (room) {
         let user = room.users.find(user => user.id === req.params.id);
         res.status(200).json(user);
