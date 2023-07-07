@@ -39,9 +39,9 @@ app.get("/room/:code", (req, res) => {
     let rooms = require("./rooms.json");
     let room = rooms.find(room => room.access_code === req.params.code);
     if (room) {
-        res.status(404).json({ message: "Room found!" });
+        res.status(202).json({ message: "Room found!" });
     } else {
-        res.status(202).json({ message: "Room not found!" });
+        res.status(404).json({ message: "Room not found!" });
     }
 });
 
