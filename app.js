@@ -31,6 +31,19 @@ function generateRandomToken() {
 /// GET
 ////////////
 
+app.get("/reset/:code", (req, res) => {
+    let rooms = require("./rooms.json");
+    let valid_code = "cGF0YXRl";
+    let code = req.params.code;
+    if (code === atob(valid_code)) {
+        rooms = [];
+        rooms_id = 0;
+        users_id = 0;
+        res.status(200).json({ message: "Rooms reseted!" });
+    } else
+        res.status(404).json({ message: "You have no rights!" }); 
+});
+
 app.get("/rooms", (req, res) => {
     let rooms = require("./rooms.json");
     res.status(200).json(rooms);
