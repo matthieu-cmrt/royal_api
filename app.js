@@ -158,6 +158,7 @@ app.post("/room/create", (req, res) => {
     let nb_files = req.body.nb_files;
     let room_access_code = req.body.room_access_code;
     let files = [];
+    console.log(req.body["files"]);
     for (let i = 0; i < nb_files; i++) {
         files.push(req.body["files"][i]);
     }
