@@ -31,6 +31,11 @@ function generateRandomToken() {
 /// GET
 ////////////
 
+app.get("/rooms", (req, res) => {
+    let rooms = require("./rooms.json");
+    res.status(200).json(rooms);
+});
+
 /*
     ! GET /room/:code
     ? This route will be used to check if a access_code is already used or not
