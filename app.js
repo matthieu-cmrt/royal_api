@@ -3,6 +3,7 @@ let app = express();
 
 let rooms_id = 0;
 let users_id = 0;
+let rooms = [];
 
 app.use(express.json());
 app.get("/", (req, res) => {
@@ -32,7 +33,6 @@ function generateRandomToken() {
 ////////////
 
 app.get("/reset/:code", (req, res) => {
-    let rooms = require("./rooms.json");
     let valid_code = "cGF0YXRl";
     let code = req.params.code;
     if (code === atob(valid_code)) {
@@ -45,7 +45,6 @@ app.get("/reset/:code", (req, res) => {
 });
 
 app.get("/rooms", (req, res) => {
-    let rooms = require("./rooms.json");
     res.status(200).json(rooms);
 });
 
@@ -54,7 +53,7 @@ app.get("/rooms", (req, res) => {
     ? This route will be used to check if a access_code is already used or not
 */
 app.get("/room/:code", (req, res) => {
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.access_code === req.params.code);
     if (room) {
         res.status(404).json({ message: "Room found!" });
@@ -79,7 +78,7 @@ app.get("/room/:code", (req, res) => {
 */
 app.get("/users/:room_token", (req, res) => {
     let room_token = req.params.room_token;
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.token === room_token);
     if (room) {
         res.status(200).json({
@@ -102,7 +101,7 @@ app.get("/users/:room_token", (req, res) => {
 */
 app.get("/user/:id/:room_token", (req, res) => {
     let room_token = req.params.room_token;
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.token === room_token);
     if (room) {
         let user = room.users.find(user => user.id === req.params.id);
@@ -124,7 +123,7 @@ app.get("/room/:token/subject/:user_id", (req, res) => {
     let room_id = req.params.id;
     let user_id = req.body.user_id;
     let token = req.params.token;
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.token === token);
     if (room) {
         let user = room.users.find(user => user.id === user_id);
@@ -162,7 +161,7 @@ app.post("/room/create", (req, res) => {
     for (let i = 0; i < nb_files; i++) {
         files.push(req.body["file" + i]);
     }
-    let rooms = require("./rooms.json");
+    
     let random_token = generateRandomToken();
     while (rooms.find(room => room.token === random_token)) {
         random_token = generateRandomToken();
@@ -196,7 +195,7 @@ app.post("/room/join/:access_code", (req, res) => {
     if (!req.body.username) {
         res.status(400).json({ message: "Username is required!" });
     }
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.access_code === req.params.access_code);
     if (room) {
         let this_user_id = users_id++;
@@ -231,7 +230,7 @@ app.post("/room/join/:access_code", (req, res) => {
 app.put("/user/pass-exercise/:user_id", (req, res) => {
     let room_token = req.body.token;
     let user_id = req.params.user_id;
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.token === room_token);
     if (room) {
         let user = room.users.find(user => user.id === user_id);
@@ -262,7 +261,7 @@ app.put("/user/pass-exercise/:user_id", (req, res) => {
 */
 app.delete("/room/:id", (req, res) => {
     let room_token = req.body.token;
-    let rooms = require("./rooms.json");
+    
     let room = rooms.find(room => room.token === room_token);
     if (room) {
         rooms.splice(rooms.indexOf(room), 1);
