@@ -159,7 +159,7 @@ app.post("/room/create", (req, res) => {
     let room_access_code = req.body.room_access_code;
     let files = [];
     for (let i = 0; i < nb_files; i++) {
-        files.push(req.body["file"][i]);
+        files.push(req.body["files"][i]);
     }
     
     let random_token = generateRandomToken();
