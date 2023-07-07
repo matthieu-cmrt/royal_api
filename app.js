@@ -158,7 +158,7 @@ app.post("/room/create", (req, res) => {
     let nb_files = req.body.nb_files;
     let room_access_code = req.body.room_access_code;
     let files = [];
-    console.log(req.body["files"]);
+    console.log(req.body["files"    ]);
     for (let i = 0; i < nb_files; i++) {
         files.push(req.body["files"][i]);
     }
@@ -237,6 +237,9 @@ app.put("/user/pass-exercise/:user_id", (req, res) => {
         let user = room.users.find(user => user.id === user_id);
         if (user) {
             user.exercise++;
+            if (user.exercise == room.nb_exercices) {
+                res.status(400).json({ message: "No more exercises!" });
+            }
             // fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
             res.status(200).json({ message: "Exercise passed!" });
         } else {
