@@ -1,6 +1,5 @@
 let express = require("express");
 let app = express();
-let fs = require("fs");
 
 let rooms_id = 0;
 let users_id = 0;
@@ -164,7 +163,7 @@ app.post("/room/create", (req, res) => {
         nb_exercices: nb_files,
         subjects: files
     });
-    fs.writeFileSync("./rooms.json", JSON.stringify(rooms));
+    // fs.writeFileSync("./rooms.json", JSON.stringify(rooms));
     res.status(200).json({ token: random_token, id: this_room_id });
 });
 
@@ -193,7 +192,7 @@ app.post("/room/join/:access_code", (req, res) => {
             username: req.body.username,
             exercise: 0
         });
-        fs.writeFileSync("./rooms.json", JSON.stringify(rooms));
+        // fs.writeFileSync("./rooms.json", JSON.stringify(rooms));
         res.status(200).json({
             room_token: room.token,
             room_id: room.id,
@@ -225,7 +224,7 @@ app.put("/user/pass-exercise/:user_id", (req, res) => {
         let user = room.users.find(user => user.id === user_id);
         if (user) {
             user.exercise++;
-            fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
+            // fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
             res.status(200).json({ message: "Exercise passed!" });
         } else {
             res.status(404).json({ message: "User not found!" });
@@ -254,7 +253,7 @@ app.delete("/room/:id", (req, res) => {
     let room = rooms.find(room => room.token === room_token);
     if (room) {
         rooms.splice(rooms.indexOf(room), 1);
-        fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
+        // fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
         res.status(200).json({ message: "Room deleted!" });
     } else {
         res.status(404).json({ message: "Room not found!" });
