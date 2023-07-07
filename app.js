@@ -141,7 +141,7 @@ app.get("/room/:token/subject/:user_id", (req, res) => {
     }
 
     if (room) {
-        let user = room.users.find(user => user.id === parseInt(user_id));
+        let user = room.users.find(user => user.id === parseInt(req.params.user_id));
         if (user) {
             let current_exercise = user.exercise;
             let subject = room.subjects[current_exercise];
