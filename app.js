@@ -132,9 +132,16 @@ app.get("/room/:token/subject/:user_id", (req, res) => {
     let user_id = req.body.user_id;
     let token = req.params.token;
     
-    let room = rooms.find(room => room.token === token);
+    let room = null;
+    for (let i = 0; i < rooms.length; i++) {
+        if (rooms[i].token === token) {
+            room = rooms[i];
+            break;
+        }
+    }
+
     if (room) {
-        let user = room.users.find(user => user.id === user_id);
+        let user = room.users.find(user => user.id === parseInt(user_id));
         if (user) {
             let current_exercise = user.exercise;
             let subject = room.subjects[current_exercise];
@@ -239,10 +246,16 @@ app.post("/room/join/:access_code", (req, res) => {
 app.put("/user/pass-exercise/:user_id", (req, res) => {
     let room_token = req.body.token;
     let user_id = req.params.user_id;
-    
-    let room = rooms.find(room => room.token === room_token);
+    let room = null;
+    for (let i = 0; i < rooms.length; i++) {
+        if (rooms[i].token === room_token) {
+            room = rooms[i];
+            break;
+        }
+    }
+
     if (room) {
-        let user = room.users.find(user => user.id === user_id);
+        let user = room.users.find(user => user.id === parseInt(user_id));
         if (user) {
             user.exercise++;
             if (user.exercise == room.nb_exercices) {
@@ -274,7 +287,14 @@ app.put("/user/pass-exercise/:user_id", (req, res) => {
 app.delete("/room/:id", (req, res) => {
     let room_token = req.body.token;
     
-    let room = rooms.find(room => room.token === room_token);
+    let room = null;
+    for (let i = 0; i < rooms.length; i++) {
+        if (rooms[i].token === room_token) {
+            room = rooms[i];
+            break;
+        }
+    }
+    
     if (room) {
         rooms.splice(rooms.indexOf(room), 1);
         // fs.writeFileSync("./rooms.json", JSON.stringify(rooms)); // Save changes
